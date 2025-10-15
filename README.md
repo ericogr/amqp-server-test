@@ -50,13 +50,13 @@ optionally forwards operations to an upstream broker like RabbitMQ.
 ## Project layout
 
  - `pkg/amqp` — SDK: frames, method parsing, ServeWithAuth, ConnContext, ServerHandlers.
-- `cmd/server` — example server using `pkg/amqp` and a simple in-memory broker.
-- `cmd/upstream` — example upstream proxy that forwards operations to a
+- `examples/server` — example server using `pkg/amqp` and a simple in-memory broker.
+- `examples/upstream` — example upstream proxy that forwards operations to a
   configured RabbitMQ instance (useful for development and integrating the
   SDK with a real broker).
-- `cmd/publish` — example publisher (uses `github.com/rabbitmq/amqp091-go`) with
+- `examples/publish` — example publisher (uses `github.com/rabbitmq/amqp091-go`) with
   flags for `--prefetch-count` and `--mandatory` to demonstrate QoS and returns.
-- `cmd/consume` — example consumer (uses official client) for demo.
+- `examples/consume` — example consumer (uses official client) for demo.
 
 ## Quick start
 
@@ -64,7 +64,7 @@ Prereqs: Go toolchain and (optionally) `openssl` for `make gen-certs`.
 
 ### Build server
 
-Builds the example server and upstream proxy binaries (`cmd/server` and `cmd/upstream`) using `go build`.
+Builds the example server and upstream proxy binaries (`examples/server` and `examples/upstream`) using `go build`.
 This produces compiled executables (named `server` and `upstream`) in the repository root so you can run them directly
 without `go run`. Use `make build` when you want a local binary for testing, debugging, or packaging for deployment.
 
@@ -87,7 +87,7 @@ Notes:
 - To run the server directly or specify a different address, use:
 
 ```bash
-go run ./cmd/server -addr :5672    # run from source (default :5672)
+go run ./examples/server -addr :5672    # run from source (default :5672)
   ./server -addr :5672               # run built binary
 ```
 
@@ -95,7 +95,7 @@ go run ./cmd/server -addr :5672    # run from source (default :5672)
   files exist at `tls/server.pem` and `tls/server.key`. Generate test certs
   with `make gen-certs`.
 - Authentication: the example accepts the PLAIN mechanism with credentials
-  `admin:admin` (see `cmd/server` for the simple auth handler). Replace or
+`admin:admin` (see `examples/server` for the simple auth handler). Replace or
   remove this in real deployments.
 
 Use this server for local testing, debugging client behavior (QoS, basic.return,
@@ -110,7 +110,7 @@ upstream RabbitMQ instance (default listens on :5673):
 make run-upstream
 ```
 
-The upstream proxy is implemented in `cmd/upstream` and accepts flags such as
+The upstream proxy is implemented in `examples/upstream` and accepts flags such as
 `-upstream` (upstream URL), `-upstream-tls`, `-upstream-tls-skip-verify`,
 `-failure-policy` and `-reconnect-delay`.
 
@@ -144,7 +144,7 @@ make publish
 Or run the example publisher with QoS/mandatory flags:
 
 ```go
-  go run ./cmd/publish --addr amqp://admin:admin@127.0.0.1:5672/ --exchange "" --key test --body hello --prefetch-count 10 --mandatory=true
+  go run ./examples/publish --addr amqp://admin:admin@127.0.0.1:5672/ --exchange "" --key test --body hello --prefetch-count 10 --mandatory=true
 ```
 
 ### Run unit tests:
@@ -262,21 +262,21 @@ make rabbit-start
 
 ```bash
 make run-upstream
-# or: go run ./cmd/upstream -addr :5673 -upstream amqp://admin:admin@127.0.0.1:5672/
+# or: go run ./examples/upstream -addr :5673 -upstream amqp://admin:admin@127.0.0.1:5672/
 ```
 
 - Start a consumer (connects to the proxy and issues `basic.consume`):
 
 ```bash
 make consume
-# or: go run ./cmd/consume --addr amqp://admin:admin@127.0.0.1:5673/ --queue test-queue
+# or: go run ./examples/consume --addr amqp://admin:admin@127.0.0.1:5673/ --queue test-queue
 ```
 
 - Publish a message (connects to the proxy and issues `basic.publish`):
 
 ```bash
 make publish
-# or: go run ./cmd/publish --addr amqp://admin:admin@127.0.0.1:5673/ --exchange "" --key test --body "hello"
+# or: go run ./examples/publish --addr amqp://admin:admin@127.0.0.1:5673/ --exchange "" --key test --body "hello"
 ```
 
 What happens (step-by-step):
@@ -334,14 +334,14 @@ AMQP 0-9-1 protocol.
   implement storage, routing, and policies (or connect to a real RabbitMQ server).
 - Field-table parsing supports common types; extend `pkg/amqp/encode.go` if you
   need more field-value types.
-- The example `cmd/server` implements a tiny in-memory broker for demonstration
+-- The example `examples/server` implements a tiny in-memory broker for demonstration
   and testing; real deployments should use RabbitMQ or an equivalent broker.
 
 ## Where to look next
 
 - `pkg/amqp` — protocol implementation and handler APIs.
-- `cmd/server` — example handlers wired to an in-memory broker.
-- `cmd/publish` / `cmd/consume` — example publisher/consumer showing QoS and returns.
+- `examples/server` — example handlers wired to an in-memory broker.
+- `examples/publish` / `examples/consume` — example publisher/consumer showing QoS and returns.
 
 See [TODO.md](TODO.md) for a compatibility checklist and outstanding work.
 

@@ -8,13 +8,13 @@ UPSTREAM_URL ?= amqp://admin:admin@127.0.0.1:5672/
 all: build
 
 build:
-	go build ./cmd/server ./cmd/upstream
+	go build ./examples/server ./examples/upstream
 
 run-basic-server:
-	go run ./cmd/server -addr :$(DEFAULT_PORT)
+	go run ./examples/server -addr :$(DEFAULT_PORT)
 
 run-upstream:
-	go run ./cmd/upstream -addr :$(DEFAULT_UPSTREAM_PORT) -upstream $(UPSTREAM_URL)
+	go run ./examples/upstream -addr :$(DEFAULT_UPSTREAM_PORT) -upstream $(UPSTREAM_URL)
 
 test:
 	go test ./... -v
@@ -43,10 +43,10 @@ rabbit-stop:
 	@docker rm amqp-rabbit >/dev/null || true
 
 publish:
-	go run ./cmd/publish --addr $(DEFAULT_URL) --exchange "" --key test --body "hello" --exchange testx --queue testq --delete-exchange true
+	go run ./examples/publish --addr $(DEFAULT_URL) --exchange "" --key test --body "hello" --exchange testx --queue testq --delete-exchange true
 
 consume:
-	go run ./cmd/consume --addr $(DEFAULT_URL) --queue test-queue
+	go run ./examples/consume --addr $(DEFAULT_URL) --queue test-queue
 
 .PHONY: gen-certs
 
